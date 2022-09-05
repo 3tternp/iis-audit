@@ -24,8 +24,7 @@ If the server is configured as recommended, the following will be displayed:
 <system.webServer>
 OR
 To verify using PowerShell enter the following command:
-Get-WebConfigurationProperty -Filter system.webserver/directorybrowse -PSPath
-iis:\ -Name Enabled | select Value
+Get-WebConfigurationProperty -Filter system.webserver/directorybrowse -PSPath iis:\ -Name Enabled | select Value
 
 4. Ensure 'application pool identity' is configured for all application pools (Scored)
 
@@ -33,9 +32,7 @@ To verify using AppCmd.exe enter the following command:
 %systemroot%\system32\inetsrv\appcmd list config /section:applicationPools
 OR
 To verify using PowerShell enter the following command:
-Get-ChildItem -Path IIS:\AppPools\ |
-Select-Object name, state, <#@{e={$_.processModel.password};l="password"}, #>
-@{e={$_.processModel.identityType};l="identityType"}
+Get-ChildItem -Path IIS:\AppPools\ | Select-Object name, state, <#@{e={$_.processModel.password};l="password"}, #> @{e={$_.processModel.identityType};l="identityType"}
 
 5. Ensure 'unique application pools' is set for sites (Scored)
 
@@ -49,9 +46,7 @@ Get-Website | Select-Object Name, applicationPool
 user identity (Scored)
 
 To verify using PowerShell enter the following command:
-Get-WebConfiguration
-system.webServer/security/authentication/anonymousAuthentication -Recurse |
-where {$_.enabled -eq $true} | format-list location 
+Get-WebConfiguration system.webServer/security/authentication/anonymousAuthentication -Recurse | where {$_.enabled -eq $true} | format-list location 
 
 7. Ensure WebDav feature is disabled (Scored)
 
@@ -61,69 +56,59 @@ Get-WindowsFeature Web-DAV-Publishing
 8. Ensure 'global authorization rule' is set to restrict access (Not Scored)
 
 To verify using AppCmd.exe enter the following command:
-%systemroot%\system32\inetsrv\appcmd list config -
-section:system.webserver/security/authorization
+%systemroot%\system32\inetsrv\appcmd list config - section:system.webserver/security/authorization
 OR
 To verify using PowerShell enter the following command:
-Get-WebConfiguration -pspath 'IIS:\' -filter
-'system.webServer/security/authorization'
+Get-WebConfiguration -pspath 'IIS:\' -filter 'system.webServer/security/authorization'
 
 9. Ensure access to sensitive site features is restricted to
 authenticated principals only (Not Scored)
 
 To verify using AppCmd.exe enter the following command:
-%systemroot%\system32\inetsrv\appcmd list config -
-section:system.web/authentication
+%systemroot%\system32\inetsrv\appcmd list config - section:system.web/authentication
 OR
 To verify using PowerShell enter the following command:
-Get-WebConfiguration system.webServer/security/authentication/* -Recurse |
-Where-Object {$_.enabled -eq $true} | Format-Table
+Get-WebConfiguration system.webServer/security/authentication/* -Recurse | Where-Object {$_.enabled -eq $true} | Format-Table
 
 10. Ensure 'forms authentication' require SSL (Scored)
 
 To verify using AppCmd.exe enter the following command:
-%systemroot%\system32\inetsrv\appcmd list config -
-section:system.web/authentication
+%systemroot%\system32\inetsrv\appcmd list config - section:system.web/authentication
 OR
 To verify using PowerShell enter the following command:
-Get-WebConfigurationProperty -pspath 'MACHINE/WEBROOT/APPHOST/Default Web
-Site' -filter 'system.web/authentication/forms' -name 'requireSSL' | FormatTable Name, Value
+Get-WebConfigurationProperty -pspath 'MACHINE/WEBROOT/APPHOST/Default WebSite' -filter 'system.web/authentication/forms' -name 'requireSSL' | FormatTable Name, Value
 
 11. Ensure 'forms authentication' is set to use cookies (Scored)
 
 To verify using AppCmd.exe enter the following command:
-%systemroot%\system32\inetsrv\appcmd list config -
-section:system.web/authentication
+%systemroot%\system32\inetsrv\appcmd list config -section:system.web/authentication
+
 OR
+
 To verify using PowerShell enter the following command:
-Get-WebConfigurationProperty -pspath 'MACHINE/WEBROOT/APPHOST/Default Web
-Site' -filter 'system.web/authentication/forms' -Recurse -name 'cookieless'
+Get-WebConfigurationProperty -pspath 'MACHINE/WEBROOT/APPHOST/Default WebSite' -filter 'system.web/authentication/forms' -Recurse -name 'cookieless'
 
 12. Ensure 'cookie protection mode' is configured for forms
 authentication (Scored)
 
 To verify using PowerShell enter the following command:
-Get-WebConfigurationProperty -pspath 'MACHINE/WEBROOT/APPHOST/<website name>'
--filter 'system.web/authentication/forms' -name 'protection'
+Get-WebConfigurationProperty -pspath 'MACHINE/WEBROOT/APPHOST/<website name>' -filter 'system.web/authentication/forms' -name 'protection'
 
 13. Ensure transport layer security for 'basic authentication' is
 configured (Scored)
 
 To verify using PowerShell enter the following command:
-Get-WebConfigurationProperty -pspath 'MACHINE/WEBROOT/APPHOST' -location
-'<website name>' -filter 'system.webServer/security/access' -name 'sslFlags'
+Get-WebConfigurationProperty -pspath 'MACHINE/WEBROOT/APPHOST' -location'<website name>' -filter 'system.webServer/security/access' -name 'sslFlags'
 
 14. Ensure 'passwordFormat' is not set to clear (Scored)
 
 To verify using PowerShell enter the following command:
-Get-WebConfigurationProperty -pspath 'MACHINE/WEBROOT/APPHOST/<website name>'
--filter 'system.web/authentication/forms/credentials' -name 'passwordFormat'
+Get-WebConfigurationProperty -pspath 'MACHINE/WEBROOT/APPHOST/<website name>' -filter 'system.web/authentication/forms/credentials' -name 'passwordFormat'
 
 15. Ensure 'credentials' are not stored in configuration files (Scored)
 
 To verify using PowerShell enter the following command:
-Get-WebConfigurationProperty -pspath 'MACHINE/WEBROOT/APPHOST/<website name>'
--filter 'system.web/authentication/forms/credentials' -name 'passwordFormat'
+Get-WebConfigurationProperty -pspath 'MACHINE/WEBROOT/APPHOST/<website name>'-filter 'system.web/authentication/forms/credentials' -name 'passwordFormat'
 
 16. Ensure 'deployment method retail' is set (Scored)
 
@@ -136,32 +121,27 @@ After the next time IIS is restarted, open the machine.config file and verify th
 17. Ensure 'debug' is turned off (Scored)
 
 To verify using PowerShell enter the following command:
-Get-WebConfigurationProperty -pspath 'MACHINE/WEBROOT/APPHOST/<website name>'
--filter "system.web/compilation" -name "debug" | format-list Name, Value
+Get-WebConfigurationProperty -pspath 'MACHINE/WEBROOT/APPHOST/<website name>' -filter "system.web/compilation" -name "debug" | format-list Name, Value
 
 18.  Ensure custom error messages are not off (Scored)
 
 To verify using PowerShell enter the following command:
-Get-WebConfigurationProperty -pspath 'MACHINE/WEBROOT/APPHOST/<website name>'
--filter "system.web/customErrors" -name "mode"
+Get-WebConfigurationProperty -pspath 'MACHINE/WEBROOT/APPHOST/<website name>' -filter "system.web/customErrors" -name "mode"
 
 19. Ensure IIS HTTP detailed errors are hidden from displaying remotely (Scored)
 
 To verify using PowerShell enter the following command:
-Get-WebConfigurationProperty -pspath 'MACHINE/WEBROOT/APPHOST/<website name>'
--filter "system.webServer/httpErrors" -name "errorMode"
+Get-WebConfigurationProperty -pspath 'MACHINE/WEBROOT/APPHOST/<website name>' -filter "system.webServer/httpErrors" -name "errorMode"
 
 20. Ensure ASP.NET stack tracing is not enabled (Scored)
 
 To verify using PowerShell enter the following command:
-Get-WebConfigurationProperty -pspath 'MACHINE/WEBROOT/APPHOST/<website name>'
--filter "system.web/trace" -name "enabled" | Format-List Name,Value
+Get-WebConfigurationProperty -pspath 'MACHINE/WEBROOT/APPHOST/<website name>' -filter "system.web/trace" -name "enabled" | Format-List Name,Value
 
 21. Ensure 'httpcookie' mode is configured for session state (Scored)
 
 To verify using PowerShell enter the following command:
-Get-WebConfigurationProperty -pspath 'MACHINE/WEBROOT/APPHOST/<website name>'
--filter "system.web/sessionState" -name "mode"
+Get-WebConfigurationProperty -pspath 'MACHINE/WEBROOT/APPHOST/<website name>' -filter "system.web/sessionState" -name "mode"
 
 22. Ensure 'cookies' are set with HttpOnly attribute (Scored)
 
@@ -181,63 +161,50 @@ dropdown
 23. Ensure 'MachineKey validation method - .Net 4.5' is configured (Scored)
 
 To verify using PowerShell enter the following command:
-Get-WebConfigurationProperty -pspath 'MACHINE/WEBROOT' -filter
-"system.web/machineKey" -name "validation"
+Get-WebConfigurationProperty -pspath 'MACHINE/WEBROOT' -filter "system.web/machineKey" -name "validation"
 
 24. Ensure global .NET trust level is configured (Scored)
 
 To verify using PowerShell enter the following command:
-Get-WebConfigurationProperty -pspath 'MACHINE/WEBROOT' -filter
-"system.web/trust" -name "level"
+Get-WebConfigurationProperty -pspath 'MACHINE/WEBROOT' -filter "system.web/trust" -name "level"
 
 25. Ensure X-Powered-By Header is removed (Not Scored)
 
 To verify using AppCmd.exe enter the following command:
-%systemroot%\system32\inetsrv\appcmd.exe list config -
-section:system.webServer/httpProtocol
+%systemroot%\system32\inetsrv\appcmd.exe list config - section:system.webServer/httpProtocol
 
 26. Ensure Server Header is removed (Not Scored)
 
 To verify using AppCmd.exe enter the following command:
-%systemroot%\system32\inetsrv\appcmd.exe list config -
-section:system.webServer/security/requestFiltering
+%systemroot%\system32\inetsrv\appcmd.exe list config - section:system.webServer/security/requestFiltering
 OR
 To verify using PowerShell enter the following command:
-Get-WebConfigurationProperty -pspath machine/webroot/apphost -filter
-'system.webserver/security/requestfiltering
-' -name 'removeServerHeader'
+Get-WebConfigurationProperty -pspath machine/webroot/apphost -filter 'system.webserver/security/requestfiltering ' -name 'removeServerHeader'
 
 27.  Ensure 'maxAllowedContentLength' is configured (Not Scored)
 
 To verify using PowerShell enter the following command:
-Get-WebConfigurationProperty -pspath 'MACHINE/WEBROOT/APPHOST' -filter
-"system.webServer/security/requestFiltering/requestLimits" -name
-"maxAllowedContentLength"
+Get-WebConfigurationProperty -pspath 'MACHINE/WEBROOT/APPHOST' -filter "system.webServer/security/requestFiltering/requestLimits" -name "maxAllowedContentLength"
 
 28. Ensure 'maxURL request filter' is configured (Scored)
 
  To verify using PowerShell enter the following command:
-Get-WebConfigurationProperty -pspath 'MACHINE/WEBROOT/APPHOST' -filter
-"system.webServer/security/requestFiltering/requestLimits" -name "maxUrl"
+Get-WebConfigurationProperty -pspath 'MACHINE/WEBROOT/APPHOST' -filter "system.webServer/security/requestFiltering/requestLimits" -name "maxUrl"
 
 29. Ensure 'MaxQueryString request filter' is configured (Scored)
 
  To verify using PowerShell enter the following command:
-Get-WebConfigurationProperty -pspath 'MACHINE/WEBROOT/APPHOST' -filter
-"system.webServer/security/requestFiltering/requestLimits" -name
-"maxQueryString"
+Get-WebConfigurationProperty -pspath 'MACHINE/WEBROOT/APPHOST' -filter "system.webServer/security/requestFiltering/requestLimits" -name "maxQueryString"
 
 30. Ensure non-ASCII characters in URLs are not allowed (Scored)
 
  To verify using PowerShell enter the following command:
-Get-WebConfigurationProperty -pspath 'MACHINE/WEBROOT/APPHOST' -filter
-'system.webServer/security/requestFiltering' -name 'allowHighBitCharacters'
+Get-WebConfigurationProperty -pspath 'MACHINE/WEBROOT/APPHOST' -filter 'system.webServer/security/requestFiltering' -name 'allowHighBitCharacters'
 
 31. Ensure Double-Encoded requests will be rejected (Scored)
 
  To verify using PowerShell enter the following command:
-Get-WebConfigurationProperty -pspath 'MACHINE/WEBROOT/APPHOST' -filter
-"system.webServer/security/requestFiltering" -name "allowDoubleEscaping"
+Get-WebConfigurationProperty -pspath 'MACHINE/WEBROOT/APPHOST' -filter "system.webServer/security/requestFiltering" -name "allowDoubleEscaping"
 
 32. Ensure 'HTTP Trace Method' is disabled (Scored)
 
@@ -251,65 +218,49 @@ an elevated command prompt:
 %systemroot%\system32\inetsrv\appcmd list config /section:requestfiltering
 
 To verify using PowerShell enter the following command
-Get-WebConfigurationProperty -pspath 'MACHINE/WEBROOT/APPHOST' -filter
-"system.webServer/security/requestFiltering/fileExtensions" -name
-"allowUnlisted"
+Get-WebConfigurationProperty -pspath 'MACHINE/WEBROOT/APPHOST' -filter "system.webServer/security/requestFiltering/fileExtensions" -name "allowUnlisted"
 
 34. Ensure Handler is not granted Write and Script/Execute (Scored)
 
  To verify using PowerShell enter the following command:
-Get-WebConfigurationProperty -pspath 'MACHINE/WEBROOT/APPHOST' -filter
-"system.webServer/handlers" -name "accessPolicy"
+Get-WebConfigurationProperty -pspath 'MACHINE/WEBROOT/APPHOST' -filter "system.webServer/handlers" -name "accessPolicy"
 
 35. Ensure 'notListedIsapisAllowed' is set to false (Scored)
 
  To verify using PowerShell enter the following command:
-Get-WebConfigurationProperty -pspath 'MACHINE/WEBROOT/APPHOST' -filter
-"system.webServer/security/isapiCgiRestriction" -name
-"notListedIsapisAllowed"
+Get-WebConfigurationProperty -pspath 'MACHINE/WEBROOT/APPHOST' -filter "system.webServer/security/isapiCgiRestriction" -name "notListedIsapisAllowed"
 
 36.  Ensure 'notListedCgisAllowed' is set to false (Scored)
 
  To verify using PowerShell enter the following command:
-Get-WebConfigurationProperty -pspath 'MACHINE/WEBROOT/APPHOST' -filter
-"system.webServer/security/isapiCgiRestriction" -name "notListedCgisAllowed"
+Get-WebConfigurationProperty -pspath 'MACHINE/WEBROOT/APPHOST' -filter "system.webServer/security/isapiCgiRestriction" -name "notListedCgisAllowed"
 
 37. Ensure 'Dynamic IP Address Restrictions' is enabled (Not Scored)
  
  To verify using PowerShell enter the following command:
-Get-WebConfigurationProperty -pspath 'MACHINE/WEBROOT/APPHOST' -filter
-"system.webServer/security/dynamicIpSecurity/denyByConcurrentRequests" -name
-"enabled"
-Get-WebConfigurationProperty -pspath 'MACHINE/WEBROOT/APPHOST' -filter
-"system.webServer/security/dynamicIpSecurity/denyByConcurrentRequests" -name
-"maxConcurrentRequests"
+Get-WebConfigurationProperty -pspath 'MACHINE/WEBROOT/APPHOST' -filter "system.webServer/security/dynamicIpSecurity/denyByConcurrentRequests" -name "enabled"
+Get-WebConfigurationProperty -pspath 'MACHINE/WEBROOT/APPHOST' -filter "system.webServer/security/dynamicIpSecurity/denyByConcurrentRequests" -name "maxConcurrentRequests"
 
 38. Ensure Default IIS web log location is moved (Scored)
 
 To verify using PowerShell enter the following command:
-Get-WebConfigurationProperty -pspath 'MACHINE/WEBROOT/APPHOST' -filter
-"system.applicationHost/sites/siteDefaults/logFile" -name "directory"
+Get-WebConfigurationProperty -pspath 'MACHINE/WEBROOT/APPHOST' -filter "system.applicationHost/sites/siteDefaults/logFile" -name "directory"
 
 39. Ensure FTP requests are encrypted (Not Scored)
 
  To verify using PowerShell enter the following commands:
-Get-WebConfigurationProperty -pspath 'MACHINE/WEBROOT/APPHOST' -filter
-"system.applicationHost/sites/siteDefaults/ftpServer/security/ssl" -name
-"controlChannelPolicy"
-Get-WebConfigurationProperty -pspath 'MACHINE/WEBROOT/APPHOST' -filter
-"system.applicationHost/sites/siteDefaults/ftpServer/security/ssl" -name
-"dataChannelPolicy"
+Get-WebConfigurationProperty -pspath 'MACHINE/WEBROOT/APPHOST' -filter "system.applicationHost/sites/siteDefaults/ftpServer/security/ssl" -name "controlChannelPolicy"
+Get-WebConfigurationProperty -pspath 'MACHINE/WEBROOT/APPHOST' -filter "system.applicationHost/sites/siteDefaults/ftpServer/security/ssl" -name "dataChannelPolicy"
 
 40. Ensure FTP Logon attempt restrictions is enabled (Not Scored)
 
  To verify using AppCmd.exe enter the following command:
-%systemroot%\system32\inetsrv\appcmd.exe list config -
-section:system.ftpServer/security/authentication
+%systemroot%\system32\inetsrv\appcmd.exe list config - section:system.ftpServer/security/authentication
+
 The output should include denyByFailure = true
 OR
 To verify using PowerShell enter the following command:
-Get-WebConfigurationProperty -pspath 'MACHINE/WEBROOT/APPHOST' -filter
-"system.ftpServer/security/authentication/denyByFailure" -name "enabled"
+Get-WebConfigurationProperty -pspath 'MACHINE/WEBROOT/APPHOST' -filter "system.ftpServer/security/authentication/denyByFailure" -name "enabled"
 
 41. Ensure HSTS Header is set (Not Scored)
 
@@ -332,197 +283,132 @@ greater than 0
 
 42. Ensure SSLv2 is Disabled (Scored)
 
-   Perform the following to verify SSL 2.0 is disabled.
+Perform the following to verify SSL 2.0 is disabled.
+
 1. Ensure the following key is set to 0.
-HKLM\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\SS
-L 2.0\Server:Enabled
-HKLM\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\SS
-L 2.0\Client:Enabled
+HKLM\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\SSL 2.0\Server:Enabled
+HKLM\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\SSL 2.0\Client:Enabled
+
 2. Ensure the following key is set to 1.
-HKLM\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\SS
-L 2.0\Server:DisabledByDefault
-HKLM\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\SS
-L 2.0\Client:DisabledByDefault
+HKLM\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\SSL 2.0\Server:DisabledByDefault
+HKLM\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\SSL 2.0\Client:DisabledByDefault
+
 To verify using PowerShell enter the following command:
-Get-ItemProperty -path
-'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocol
-s\SSL 2.0\Server' -name 'Enabled'
-Get-ItemProperty -path
-'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocol
-s\SSL 2.0\Client' -name 'Enabled'
-Get-ItemProperty -path
-'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocol
-s\SSL 2.0\Server' -name 'DisabledByDefault'
-Get-ItemProperty -path
-'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocol
-s\SSL 2.0\Client' -name 'DisabledByDefault'
+Get-ItemProperty -path 'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\SSL 2.0\Server' -name 'Enabled'
+Get-ItemProperty -path 'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\SSL 2.0\Client' -name 'Enabled'
+Get-ItemProperty -path 'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\SSL 2.0\Server' -name 'DisabledByDefault'
+Get-ItemProperty -path 'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\SSL 2.0\Client' -name 'DisabledByDefault'
 
 43. Ensure SSLv3 is Disabled (Scored)
 
 1. Ensure the following key is set to 0.
-HKLM\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\SS
-L 3.0\Server:Enabled
-HKLM\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\SS
-L 3.0\Client:Enabled
+HKLM\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\SSL 3.0\Server:Enabled
+HKLM\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\SSL 3.0\Client:Enabled
+
 2. Ensure the following key is set to 1.
-HKLM\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\SS
-L 3.0\Server:DisabledByDefault
-HKLM\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\SS
-L 3.0\Client:DisabledByDefault
+HKLM\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\SSL 3.0\Server:DisabledByDefault
+HKLM\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\SSL 3.0\Client:DisabledByDefault
+
 To verify using PowerShell enter the following command:
-Get-ItemProperty -path
-'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocol
-s\SSL 3.0\Server' -name 'Enabled'
-Get-ItemProperty -path
-'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocol
-s\SSL 3.0\Client' -name 'Enabled'
-Get-ItemProperty -path
-'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocol
-s\SSL 3.0\Server' -name 'DisabledByDefault'
-Get-ItemProperty -path
-'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocol
-s\SSL 3.0\Client' -name 'DisabledByDefault'
+Get-ItemProperty -path 'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\SSL 3.0\Server' -name 'Enabled'
+Get-ItemProperty -path 'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\SSL 3.0\Client' -name 'Enabled'
+Get-ItemProperty -path 'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\SSL 3.0\Server' -name 'DisabledByDefault'
+Get-ItemProperty -path 'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\SSL 3.0\Client' -name 'DisabledByDefault'
 
 44. Ensure TLS 1.0 is Disabled (Scored)
 
  1. Ensure the following key is set to 0.
-HKLM\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\TL
-S 1.0\Server:Enabled
-HKLM\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\TL
-S 1.0\Client:Enabled
+HKLM\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\TLS 1.0\Server:Enabled
+HKLM\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\TLS 1.0\Client:Enabled
+
 2. Ensure the following key is set to 1.
-HKLM\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\TL
-S 1.0\Server:DisabledByDefault
-HKLM\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\TL
-S 1.0\Client:DisabledByDefault
+HKLM\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\TLS 1.0\Server:DisabledByDefault
+HKLM\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\TLS 1.0\Client:DisabledByDefault
+
 To verify using PowerShell enter the following command:
-Get-ItemProperty -path
-'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocol
-s\TLS 1.0\Server' -name 'Enabled'
-Get-ItemProperty -path
-'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocol
-s\TLS 1.0\Client' -name 'Enabled'
-Get-ItemProperty -path
-'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocol
-s\TLS 1.0\Server' -name 'DisabledByDefault'
-Get-ItemProperty -path
-'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocol
-s\TLS 1.0\Client' -name 'DisabledByDefault'
+Get-ItemProperty -path 'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\TLS 1.0\Server' -name 'Enabled'
+Get-ItemProperty -path 'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\TLS 1.0\Client' -name 'Enabled'
+Get-ItemProperty -path 'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\TLS 1.0\Server' -name 'DisabledByDefault'
+Get-ItemProperty -path 'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\TLS 1.0\Client' -name 'DisabledByDefault'
 
 45. Ensure TLS 1.1 is Disabled (Scored)
 
  Perform the following to verify TLS 1.1 is disabled:
+
 1. Ensure the following key is set to 0.
-HKLM\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\TL
-S 1.1\Server:Enabled
-HKLM\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\TL
-S 1.1\Client:Enabled
+HKLM\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\TLS 1.1\Server:Enabled
+HKLM\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\TLS 1.1\Client:Enabled
+
 2. Ensure the following key is set to 1.
-HKLM\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\TL
-S 1.1\Server:DisabledByDefault
-HKLM\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\TL
-S 1.1\Client:DisabledByDefault
+HKLM\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\TLS 1.1\Server:DisabledByDefault
+HKLM\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\TLS 1.1\Client:DisabledByDefault
+
 To verify using PowerShell enter the following command:
-Get-ItemProperty -path
-'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocol
-s\TLS 1.1\Server' -name 'Enabled'
-Get-ItemProperty -path
-'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocol
-s\TLS 1.1\Client' -name 'Enabled'
-Get-ItemProperty -path
-'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocol
-s\TLS 1.1\Server' -name 'DisabledByDefault'
-Get-ItemProperty -path
-'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocol
-s\TLS 1.1\Client' -name 'DisabledByDefault'
+Get-ItemProperty -path 'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\TLS 1.1\Server' -name 'Enabled'
+Get-ItemProperty -path 'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\TLS 1.1\Client' -name 'Enabled'
+Get-ItemProperty -path 'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\TLS 1.1\Server' -name 'DisabledByDefault'
+Get-ItemProperty -path 'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\TLS 1.1\Client' -name 'DisabledByDefault'
 
 46. Ensure TLS 1.2 is Enabled (Scored)
 
 Perform the following to verify TLS 1.2 is enabled:
 1. Ensure the following key is set to 1.
-HKLM\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\TL
-S 1.2\Server:Enabled
+HKLM\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\TLS 1.2\Server:Enabled
+
 2. Ensure the following key is set to 0.
-HKLM\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\TL
-S 1.2\Server:DisabledByDefault
+HKLM\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\TLS 1.2\Server:DisabledByDefault
+
 To verify using PowerShell enter the following command:
-Get-ItemProperty -path
-'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocol
-s\TLS 1.2\Server' -name 'Enabled'
-Get-ItemProperty -path
-'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocol
-s\TLS 1.2\Server' -name 'DisabledByDefault'
+Get-ItemProperty -path 'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\TLS 1.2\Server' -name 'Enabled'
+Get-ItemProperty -path 'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\TLS 1.2\Server' -name 'DisabledByDefault'
 
 47. Ensure NULL Cipher Suites is Disabled (Scored)
 
  Perform the following to verify NULL cipher is disabled:
 1. Ensure the following key is set to 0.
-HKLM\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Ciphers\NULL
-:Enabled
+HKLM\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Ciphers\NULL :Enabled
+
 To verify using PowerShell enter the following command:
-Get-ItemProperty -path
-'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Ciphers\NU
-LL' -name 'Enabled'
+Get-ItemProperty -path 'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Ciphers\NULL' -name 'Enabled'
 
 48. Ensure DES Cipher Suites is Disabled (Scored)
 
  Perform the following to verify DES 56/56 cipher is disabled:
 1. Ensure the following key is set to 0.
-HKLM\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Ciphers\DES
-56/56:Enabled
+HKLM\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Ciphers\DES 56/56:Enabled
+
 To verify using PowerShell enter the following command:
-Get-ItemProperty -path
-'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Ciphers\DE
-S 56/56' -name 'Enabled'
+Get-ItemProperty -path 'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Ciphers\DES 56/56' -name 'Enabled'
 
 49. Ensure RC4 Cipher Suites is Disabled (Scored)
 
  1. Ensure the following keys are set to 0.
-HKLM\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Ciphers\RC4
-40/128:Enabled
-HKLM\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Ciphers\RC4
-56/128:Enabled
-HKLM\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Ciphers\RC4
-64/128:Enabled
-HKLM\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Ciphers\RC4
-128/128:Enabled
+HKLM\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Ciphers\RC4 40/128:Enabled
+HKLM\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Ciphers\RC4 56/128:Enabled
+HKLM\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Ciphers\RC4 64/128:Enabled
+HKLM\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Ciphers\RC4 128/128:Enabled
+
 To verify using PowerShell enter the following commands:
-Get-ItemProperty -path
-'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Ciphers\RC
-4 40/128' -name 'Enabled'
-Get-ItemProperty -path
-'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Ciphers\RC
-4 56/128' -name 'Enabled'
-Get-ItemProperty -path
-'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Ciphers\RC
-4 64/128' -name 'Enabled'
-Get-ItemProperty -path
-'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Ciphers\RC
-4 128/128' -name 'Enabled'
+Get-ItemProperty -path 'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Ciphers\RC4 40/128' -name 'Enabled'
+Get-ItemProperty -path 'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Ciphers\RC4 56/128' -name 'Enabled'
+Get-ItemProperty -path 'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Ciphers\RC4 64/128' -name 'Enabled'
+Get-ItemProperty -path 'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Ciphers\RC4 128/128' -name 'Enabled'
 
 50. Ensure AES 128/128 Cipher Suite is Disabled (Scored)
 
  1. Ensure the following key is set to 0.
-HKLM\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Ciphers\AES
-128/128:Enabled
+HKLM\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Ciphers\AES 128/128:Enabled
 To verify using PowerShell enter the following command:
-Get-ItemProperty -path
-'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Ciphers\AE
-S 128/128' -name 'Enabled'
+Get-ItemProperty -path 'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Ciphers\AES 128/128' -name 'Enabled'
 
 51. Ensure AES 256/256 Cipher Suite is Enabled (Scored)
 
  1. Ensure the following key is set to 1.
-HKLM\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Ciphers\AES
-256/256:Enabled
+HKLM\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Ciphers\AES 256/256:Enabled
 To verify using PowerShell enter the following command:
-Get-ItemProperty -path
-'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Ciphers\AE
-S 256/256' -name 'Enabled'
+Get-ItemProperty -path 'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Ciphers\AES 256/256' -name 'Enabled'
 
 52. Ensure TLS Cipher Suite ordering is Configured (Scored)
 
  To verify using PowerShell enter the following command:
-Get-ItemProperty -path
-'HKLM:\SOFTWARE\Policies\Microsoft\Cryptography\Configuration\SSL\00010002' -
-name 'Functions'
+Get-ItemProperty -path 'HKLM:\SOFTWARE\Policies\Microsoft\Cryptography\Configuration\SSL\00010002' - name 'Functions'
